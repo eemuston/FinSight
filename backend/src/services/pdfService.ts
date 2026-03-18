@@ -22,7 +22,9 @@ const extractPdfWithClaude = async (file: Express.Multer.File) => {
 
     const response = await anthropic.messages.create({
         model: "claude-haiku-4-5-20251001",
+        //haiku is cheaper than sonnet and good for here.
         max_tokens: 300,
+        // 300 max only for testing. REMEMBER TO PUMP UP FOR LARGER SKALE TESTING!
         messages: [{
             role: 'user',
             content: [{
@@ -36,6 +38,7 @@ const extractPdfWithClaude = async (file: Express.Multer.File) => {
             {
                 type: 'text',
                 text: 'Extract all text from this document. Return only the raw text, nothing else. No need for comments or explanations'
+                //might need some tweaks still. better than it was before
             }
         ]
         }]
@@ -53,6 +56,7 @@ const chunkText = (text: string, chunkSize: number = 500, overlap: number = 50):
         const end =  start + chunkSize
         chunks.push(text.slice(start, end))
         start = end - overlap
+        //overlap is to prevent sentences being cut from the middle
     }
     return chunks
 }
@@ -61,6 +65,7 @@ const embeddings = async (chunks: string[]): Promise<number[][]> => {
     const result = await vo.embed({
         input: chunks,
         model: "voyage-finance-2"
+        //model for finance could be good for finance app.
     })
     return (result.data ?? []).map(item => item.embedding ?? [])
 }
