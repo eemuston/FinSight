@@ -123,6 +123,15 @@ const storeInQdrant = async (chunks: string [], embeddings: number[][], collecti
     })
 }
 
+const updateStatus = async (collectionName: string) => {
+    const reportSummary = await ReportSummary.findOne({ fileName: collectionName })
+    if (!reportSummary) throw new Error('Report not found when updating status.')
+        
+    reportSummary.status = 'ready'
+
+    await reportSummary.save()
+}
+
 const processPdf = async (file: Express.Multer.File) => {
     const extractedText = await extractPdfWithClaude(file)
     await createReportSummary(file, extractedText)
@@ -130,6 +139,7 @@ const processPdf = async (file: Express.Multer.File) => {
     const embeddedText = await embeddings(chunkedText)
     await collectionCreation(file.filename)
     await storeInQdrant(chunkedText, embeddedText, file.filename)
+    await updateStatus(file.filename)
     return { message: 'received'}
 }
 
