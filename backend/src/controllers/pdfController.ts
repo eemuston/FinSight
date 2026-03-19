@@ -6,8 +6,12 @@ const uploadPdf = async (req: Request, res: Response) => {
         res.status(400).send({ error: 'No file uploaded' })
         return
     }
-    const result = await pdfService.processPdf(req.file)
-    res.send(result)
+    try {
+        const result = await pdfService.processPdf(req.file)
+        res.send(result)
+    } catch(error) {
+        res.status(500).json({ error: error instanceof Error ? error.message : 'Processing failed'})
+    }
 }
 
 export default { uploadPdf }
