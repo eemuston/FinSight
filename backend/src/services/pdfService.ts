@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { VoyageAIClient } from 'voyageai'
 import { QdrantClient } from '@qdrant/js-client-rest'
 import type { Express } from 'express'
+import ReportSummary from '../models/reportSummary'
 import fs from 'fs'
 
 const anthropic = new Anthropic({
@@ -48,6 +49,34 @@ const extractPdfWithClaude = async (file: Express.Multer.File) => {
     return textBlock.text;
 }
 
+const createReportSummary = async (file: Express.Multer.File, text: string) => {
+    const fileName = file.filename
+    const originalName = file.originalname
+
+    const summary = await anthropic.messages.create({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 300,
+        // again limited max for testing.
+        messages: [{
+            role: 'user',
+            content: `You are world-leading financial analyst. Analyze this annual report and provide a concise investor summary covering: company overview, financial health, key strengths, and main risks. Be direct and specific. \n\n ${text}`
+            // The content itself is good but it needs tweaks for the out formatting.
+        }]
+    })
+
+    const summaryBlock = summary.content.find(block => block.type === 'text')
+    if (!summaryBlock || summaryBlock.type !== 'text') throw new Error('Summary generation failed!')
+
+    const reportSummary = new ReportSummary({
+        fileName: fileName,
+        originalName: originalName,
+        summary: summaryBlock.text
+    })
+    //Will add more data to here when needed. The schema already has extra fields but only these are required. Some also have default values.
+
+    await reportSummary.save()
+}
+
 const chunkText = (text: string, chunkSize: number = 500, overlap: number = 50): string [] => {
     const chunks: string [] = []
     let start = 0
@@ -70,21 +99,22 @@ const embeddings = async (chunks: string[]): Promise<number[][]> => {
     return (result.data ?? []).map(item => item.embedding ?? [])
 }
 
-const collectionCreation = async () => {
+const collectionCreation = async (collectionName: string) => {
     const collections = await qdrant.getCollections()
-    const exists = collections.collections.some(c => c.name === 'test')
-    if (! exists){
-        await qdrant.createCollection('test', {
+    const exists = collections.collections.some(c => c.name === collectionName)
+    if (!exists){
+        await qdrant.createCollection(collectionName, {
             vectors: {
                 size: 1024,
                 distance: 'Cosine'
+                //If need to change embedding model check that these match also that size and distance needs to be changed.
             }
         })
     }
 }        
 
-const storeInQdrant = async (chunks: string [], embeddings: number[][]) => {
-    await qdrant.upsert('test', {
+const storeInQdrant = async (chunks: string [], embeddings: number[][], collectionName: string) => {
+    await qdrant.upsert(collectionName, {
         points: chunks.map((chunk, index) => ({
             id: index,
             vector: embeddings[index],
@@ -95,12 +125,11 @@ const storeInQdrant = async (chunks: string [], embeddings: number[][]) => {
 
 const processPdf = async (file: Express.Multer.File) => {
     const extractedText = await extractPdfWithClaude(file)
+    await createReportSummary(file, extractedText)
     const chunkedText = chunkText(extractedText)
     const embeddedText = await embeddings(chunkedText)
-    await collectionCreation()
-    await storeInQdrant(chunkedText, embeddedText)
-    console.log(extractedText)
-    console.log(embeddedText)
+    await collectionCreation(file.filename)
+    await storeInQdrant(chunkedText, embeddedText, file.filename)
     return { message: 'received'}
 }
 
