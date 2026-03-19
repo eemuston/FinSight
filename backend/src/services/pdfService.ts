@@ -124,9 +124,10 @@ const storeInQdrant = async (chunks: string [], embeddings: number[][], collecti
 }
 
 const updateStatus = async (collectionName: string) => {
+    //Add status as argument so we can pass ready and error and use this function in error handling.
     const reportSummary = await ReportSummary.findOne({ fileName: collectionName })
     if (!reportSummary) throw new Error('Report not found when updating status.')
-        
+
     reportSummary.status = 'ready'
 
     await reportSummary.save()
