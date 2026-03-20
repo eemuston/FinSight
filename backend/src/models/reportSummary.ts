@@ -1,17 +1,48 @@
 import mongoose, { Document } from "mongoose"
 
 const reportSummarySchema = new mongoose.Schema({
+    //report identity
     fileName: { type: String, required: true }, //we want the multer hash here so we can use it as unique id everywhere. Like Qdrant collection names and shit.
     originalName: { type: String, required: true},
     uploadedAt: { type: Date, default: Date.now },
-    summary: { type: String, required: true},
-    companyName: { type: String },
-    reportYear: { type: Number },
     status: {
         type: String,
         enum: ['processing', 'ready', 'error'],
         default: 'processing'
-    }
+    },
+    
+
+    //AI analysis
+    summary: { type: String, required: true},
+    companyName: { type: String },
+    reportYear: { type: Number },
+    healthRating: { type: String, enum: ['Healthy', 'Caution', 'Risky']},
+
+    //AI scores for the company to display on frontend
+    scores: {
+        liquidity: Number,
+        profitability: Number,
+        debt: Number,
+        growth: Number,
+        overallHealth: Number,
+    },
+
+    //Key metrics to display in frontend
+    keyMetriccs: {
+        revenue: String,
+        revenueGrowth: String,
+        netIncome: String,
+        grossMargin: String,
+        cashPosition: String,
+        debtToEquity: String,
+        currentRation: String,
+        employees: String
+    },
+
+
+    //Strengths and risks.
+    keyStrengths: [String],
+    keyRisks: [String]
 })
 
 reportSummarySchema.set('toJSON', {
