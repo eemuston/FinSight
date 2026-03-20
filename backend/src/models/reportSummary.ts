@@ -10,7 +10,6 @@ const reportSummarySchema = new mongoose.Schema({
         enum: ['processing', 'ready', 'error'],
         default: 'processing'
     },
-    
 
     //AI analysis
     summary: { type: String, required: true},
@@ -28,7 +27,7 @@ const reportSummarySchema = new mongoose.Schema({
     },
 
     //Key metrics to display in frontend
-    keyMetriccs: {
+    keyMetrics: {
         revenue: String,
         revenueGrowth: String,
         netIncome: String,
@@ -38,7 +37,6 @@ const reportSummarySchema = new mongoose.Schema({
         currentRation: String,
         employees: String
     },
-
 
     //Strengths and risks.
     keyStrengths: [String],
