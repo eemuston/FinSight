@@ -160,7 +160,7 @@ const chunkText = (text: string, chunkSize: number = 500, overlap: number = 50):
     return chunks
 }
 
-const embeddings = async (chunks: string[]): Promise<number[][]> => {
+const pdfEmbeddings = async (chunks: string[]): Promise<number[][]> => {
     const result = await vo.embed({
         input: chunks,
         model: "voyage-finance-2"
@@ -183,17 +183,17 @@ const collectionCreation = async (collectionName: string) => {
     }
 }        
 
-const storeInQdrant = async (chunks: string [], embeddings: number[][], collectionName: string) => {
+const storeInQdrant = async (chunks: string [], textVector: number[][], collectionName: string) => {
     await qdrant.upsert(collectionName, {
         points: chunks.map((chunk, index) => ({
             id: index,
-            vector: embeddings[index],
+            vector: textVector[index],
             payload: { text: chunk }
         }))
     })
 }
 
-const updateStatus = async (collectionName: string, status: 'ready' | 'error' | 'processing') => {
+const updateStatus = async (collectionName: string, status: 'processing' | 'ready' | 'error') => {
     //Add status as argument so we can pass ready and error and use this function in error handling.
     const reportSummary = await ReportSummary.findOne({ fileName: collectionName })
     if (!reportSummary) throw new Error('Report not found when updating status.')
@@ -210,9 +210,9 @@ const processPdf = async (file: Express.Multer.File) => {
         await createReportSummary(file, extractedText)
          console.log(extractedText)
         const chunkedText = chunkText(extractedText)
-        const embeddedText = await embeddings(chunkedText)
+        const textVector = await pdfEmbeddings(chunkedText)
         await collectionCreation(file.filename)
-        await storeInQdrant(chunkedText, embeddedText, file.filename)
+        await storeInQdrant(chunkedText, textVector, file.filename)
         await updateStatus(file.filename, 'ready')
         return { success: true }
     } catch (error) {
