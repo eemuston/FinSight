@@ -23,7 +23,8 @@ const processSearch = async (collectionName: string, searchQuestion :string) => 
 
     const results = await qdrant.search(collectionName, {
         vector: searchVector,
-        limit: 4
+        limit: 1
+        //limit is 1 for testing. 4 or 5 chunks needed probably in real app.
     })
 
     return results
