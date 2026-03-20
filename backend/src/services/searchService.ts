@@ -1,7 +1,12 @@
 import { VoyageAIClient } from 'voyageai'
+import { QdrantClient } from '@qdrant/js-client-rest'
 
 const vo = new VoyageAIClient({
     apiKey: process.env.VOYAGE_API_KEY
+})
+
+const qdrant = new QdrantClient({
+    url: process.env.QDRANT_URL
 })
 
 const searchEmbeddings = async (searchQuestion: string): Promise<number[]> => {
@@ -15,4 +20,13 @@ const searchEmbeddings = async (searchQuestion: string): Promise<number[]> => {
 
 const processSearch = async (collectionName: string, searchQuestion :string) => {
     const searchVector = await searchEmbeddings(searchQuestion)
+
+    const results = await qdrant.search(collectionName, {
+        vector: searchVector,
+        limit: 4
+    })
+
+    return results
 }
+
+export default { processSearch }
