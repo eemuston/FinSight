@@ -1,7 +1,7 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import userService from '../services/userService'
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.body || !req.body.username || !req.body.password) {
         res.status(400).send({ error: 'Username and password are required' })
         return
@@ -10,8 +10,7 @@ const createUser = async (req: Request, res: Response) => {
         const result = await userService.processUser(req.body)
         res.send(result)
     } catch(error) {
-        res.status(400).json({ error: error instanceof Error ? error.message : 'User creation failed'})
-        //status 400 means client error. 500 server error. Might want to do a check which error we want to use
+        next(error)
     }
 }
 

@@ -6,18 +6,25 @@ import pdfRouter from './routes/pdf'
 import searchRouter from './routes/search'
 import userRouter from './routes/users'
 import loginRouter from './routes/login'
+import middleware from './utils/middleware'
 import mongoose from 'mongoose'
 const app = express()
-app.use(express.json())
 
 mongoose.connect(config.MONGODB_URI!)
-    .then(() => console.log('MongoDB connected'))
-    .catch(error => console.error('MongoDB connection error:', error))
+.then(() => console.log('MongoDB connected'))
+.catch(error => console.error('MongoDB connection error:', error))
 
-app.use('/api/pdf', pdfRouter)
-app.use('/api/search', searchRouter)
+app.use(express.json())
+app.use(middleware.requestLogger)
+app.use(middleware.tokenExtractor)
+
+app.use('/api/pdf', middleware.userExtractor, pdfRouter)
+app.use('/api/search', middleware.userExtractor, searchRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
+
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 
 app.listen(config.PORT, () => {
     console.log(`Server running on port ${config.PORT}`)
