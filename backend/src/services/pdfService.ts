@@ -1,22 +1,8 @@
-import Anthropic from '@anthropic-ai/sdk'
-import { VoyageAIClient } from 'voyageai'
-import { QdrantClient } from '@qdrant/js-client-rest'
+import { anthropic, voyageClient, qdrantClient } from '../utils/clients'
 import type { Express } from 'express'
 import ReportSummary from '../models/reportSummary'
 import { PDFDocument } from 'pdf-lib'
 import fs from 'fs'
-
-const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY
-})
-
-const vo = new VoyageAIClient({
-    apiKey: process.env.VOYAGE_API_KEY
-})
-
-const qdrant = new QdrantClient({
-    url: process.env.QDRANT_URL
-})
 
 const extractFirstPages = async (filePath: string, pages: number = 3): Promise<string> => {
     const pdfBuffer = fs.readFileSync(filePath)
@@ -235,7 +221,7 @@ const chunkText = (text: string, chunkSize: number = 500, overlap: number = 50):
 }
 
 const pdfEmbeddings = async (chunks: string[]): Promise<number[][]> => {
-    const result = await vo.embed({
+    const result = await voyageClient.embed({
         input: chunks,
         model: "voyage-finance-2"
         //model for finance could be good for finance app.
@@ -244,10 +230,10 @@ const pdfEmbeddings = async (chunks: string[]): Promise<number[][]> => {
 }
 
 const collectionCreation = async (collectionName: string) => {
-    const collections = await qdrant.getCollections()
+    const collections = await qdrantClient.getCollections()
     const exists = collections.collections.some(c => c.name === collectionName)
     if (!exists){
-        await qdrant.createCollection(collectionName, {
+        await qdrantClient.createCollection(collectionName, {
             vectors: {
                 size: 1024,
                 distance: 'Cosine'
@@ -258,7 +244,7 @@ const collectionCreation = async (collectionName: string) => {
 }        
 
 const storeInQdrant = async (chunks: string [], textVector: number[][], collectionName: string) => {
-    await qdrant.upsert(collectionName, {
+    await qdrantClient.upsert(collectionName, {
         points: chunks.map((chunk, index) => ({
             id: index,
             vector: textVector[index],

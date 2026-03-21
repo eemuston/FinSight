@@ -1,16 +1,7 @@
-import { VoyageAIClient } from 'voyageai'
-import { QdrantClient } from '@qdrant/js-client-rest'
-
-const vo = new VoyageAIClient({
-    apiKey: process.env.VOYAGE_API_KEY
-})
-
-const qdrant = new QdrantClient({
-    url: process.env.QDRANT_URL
-})
+import { voyageClient, qdrantClient } from '../utils/clients'
 
 const searchEmbeddings = async (searchQuestion: string): Promise<number[]> => {
-    const result = await vo.embed({
+    const result = await voyageClient.embed({
         input: [searchQuestion],
         model: "voyage-finance-2"
         //model for finance could be good for finance app.
@@ -21,7 +12,7 @@ const searchEmbeddings = async (searchQuestion: string): Promise<number[]> => {
 const processSearch = async (collectionName: string, searchQuestion :string) => {
     const searchVector = await searchEmbeddings(searchQuestion)
 
-    const results = await qdrant.search(collectionName, {
+    const results = await qdrantClient.search(collectionName, {
         vector: searchVector,
         limit: 1
         //limit is 1 for testing. 4 or 5 chunks needed probably in real app.

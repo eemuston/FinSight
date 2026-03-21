@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import User from '../models/user'
 import { NewLogin } from '../types'
+import { config } from '../utils/config'
 
 const processLogin = async (user: NewLogin) => {
     const { username, password } = user
@@ -22,12 +23,9 @@ const processLogin = async (user: NewLogin) => {
         id: userObj._id
     }
 
-    const JWT_SECRET = process.env.JWT_SECRET
-    if (!JWT_SECRET) throw new Error('JWT_SECRET not defined')
-
     const token = jwt.sign(
         userForToken,
-        JWT_SECRET,
+        config.JWT_SECRET,
         { expiresIn: 60*60 }
     )
 
