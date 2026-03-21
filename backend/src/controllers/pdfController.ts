@@ -6,8 +6,12 @@ const uploadPdf = async (req: Request, res: Response, next: NextFunction) => {
         res.status(400).send({ error: 'No file uploaded' })
         return
     }
+    if (!req.user) {
+        res.status(401).send({ error: 'Authentication required.'})
+        return
+    }
     try {
-        const result = await pdfService.processPdf(req.file)
+        const result = await pdfService.processPdf(req.file, req.user._id)
         res.send(result)
     } catch(error) {
         next(error)

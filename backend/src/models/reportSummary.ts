@@ -10,6 +10,10 @@ const reportSummarySchema = new mongoose.Schema({
         enum: ['processing', 'ready', 'error'],
         default: 'processing'
     },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
 
     //AI analysis
     summary: { type: String, required: true},

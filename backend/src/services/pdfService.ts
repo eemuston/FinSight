@@ -3,6 +3,7 @@ import type { Express } from 'express'
 import ReportSummary from '../models/reportSummary'
 import { PDFDocument } from 'pdf-lib'
 import fs from 'fs'
+import User from '../models/user'
 
 const extractFirstPages = async (filePath: string, pages: number = 3): Promise<string> => {
     const pdfBuffer = fs.readFileSync(filePath)
@@ -105,7 +106,7 @@ const extractPdfWithClaude = async (file: Express.Multer.File) => {
     return textBlock.text;
 }
 
-const createReportSummary = async (file: Express.Multer.File, text: string) => {
+const createReportSummary = async (file: Express.Multer.File, text: string, userId: string) => {
     const fileName = file.filename
     const originalName = file.originalname
 
@@ -193,6 +194,7 @@ const createReportSummary = async (file: Express.Multer.File, text: string) => {
     const reportSummary = new ReportSummary({
         fileName: fileName,
         originalName: originalName,
+        user: userId,
         summary: analysis.summary,
         companyName: analysis.companyName,
         reportYear: analysis.reportYear,
@@ -204,7 +206,14 @@ const createReportSummary = async (file: Express.Multer.File, text: string) => {
     })
     //Will add more data like USER to here when needed.
 
-    await reportSummary.save()
+    const savedReport = await reportSummary.save()
+
+    //Add report ref to user data
+    const user = await User.findById(userId)
+    if (user) {
+        user.reports = user.reports.concat(savedReport._id)
+        await user.save()
+    }
 }
 
 const chunkText = (text: string, chunkSize: number = 500, overlap: number = 50): string [] => {
@@ -263,23 +272,23 @@ const updateStatus = async (collectionName: string, status: 'processing' | 'read
     await reportSummary.save()
 }
 
-const processPdf = async (file: Express.Multer.File) => {
+const processPdf = async (file: Express.Multer.File, userId: string) => {
     try {
         await fileValidation(file)
         const extractedText = await extractPdfWithClaude(file)
-        await createReportSummary(file, extractedText)
-         console.log(extractedText)
+        await createReportSummary(file, extractedText, userId)
         const chunkedText = chunkText(extractedText)
         const textVector = await pdfEmbeddings(chunkedText)
         await collectionCreation(file.filename)
         await storeInQdrant(chunkedText, textVector, file.filename)
         await updateStatus(file.filename, 'ready')
+        fs.unlinkSync(file.path) //clean up 
         return { success: true }
     } catch (error) {
         try {
             await updateStatus(file.filename, 'error')
         } catch {}
-        fs.unlinkSync(file.path)
+        fs.unlinkSync(file.path) //clean up 
         throw error
     }
 }
