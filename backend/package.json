@@ -15,6 +15,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.79.0",
     "@qdrant/js-client-rest": "^1.17.0",
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "mongoose": "^9.3.1",
@@ -23,6 +24,7 @@
     "voyageai": "^0.2.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/mongoose": "^5.11.96",
     "@types/multer": "^2.1.0",

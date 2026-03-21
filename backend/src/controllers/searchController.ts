@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import searchService from "../services/searchService";
+import searchService from '../services/searchService'
 
 const searchVector = async (req: Request, res: Response) => {
     if (!req.body.collectionName || !req.body.searchQuestion) {

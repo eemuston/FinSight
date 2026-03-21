@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import pdfService from "../services/pdfService";
+import pdfService from '../services/pdfService'
 
 const uploadPdf = async (req: Request, res: Response) => {
     if (!req.file) {

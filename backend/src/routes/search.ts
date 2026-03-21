@@ -1,8 +1,8 @@
 import express from "express";
 import searchController from "../controllers/searchController";
 
-const router = express.Router()
+const searchRouter = express.Router()
 
-router.post('/search', searchController.searchVector)
+searchRouter.post('/', searchController.searchVector)
 
-export default router
+export default searchRouter
