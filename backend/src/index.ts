@@ -1,14 +1,15 @@
 import dotenv from 'dotenv'
 dotenv.config()
-import express from 'express';
+import express from 'express'
 import pdfRouter from './routes/pdf'
 import searchRouter from './routes/search'
-import userRouter from './routes/users';
-import mongoose from 'mongoose';
-const app = express();
-app.use(express.json());
+import userRouter from './routes/users'
+import loginRouter from './routes/login'
+import mongoose from 'mongoose'
+const app = express()
+app.use(express.json())
 
-const PORT = 3000;
+const PORT = 3000
 
 mongoose.connect(process.env.MONGODB_URI!)
     .then(() => console.log('MongoDB connected'))
@@ -17,7 +18,8 @@ mongoose.connect(process.env.MONGODB_URI!)
 app.use('/api/pdf', pdfRouter)
 app.use('/api/search', searchRouter)
 app.use('/api/users', userRouter)
+app.use('/api/login', loginRouter)
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+    console.log(`Server running on port ${PORT}`)
+})

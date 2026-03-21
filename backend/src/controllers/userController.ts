@@ -10,7 +10,8 @@ const createUser = async (req: Request, res: Response) => {
         const result = await userService.processUser(req.body)
         res.send(result)
     } catch(error) {
-        res.status(500).json({ error: error instanceof Error ? error.message : 'User creation failed'})
+        res.status(400).json({ error: error instanceof Error ? error.message : 'User creation failed'})
+        //status 400 means client error. 500 server error. Might want to do a check which error we want to use
     }
 }
 
