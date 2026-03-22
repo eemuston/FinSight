@@ -1,6 +1,6 @@
 import { voyageClient, qdrantClient } from '../utils/clients'
-import ReportSummary from '../models/reportSummary'
-
+import { validateReportOwnership } from '../utils/reportUtils'
+ 
 const searchEmbeddings = async (searchQuestion: string): Promise<number[]> => {
     const result = await voyageClient.embed({
         input: [searchQuestion],
@@ -11,11 +11,7 @@ const searchEmbeddings = async (searchQuestion: string): Promise<number[]> => {
 }
 
 const processSearch = async (collectionName: string, searchQuestion :string, userId: string) => {
-    const report = await ReportSummary.findOne({
-        fileName: collectionName,
-        user: userId
-    })
-    if(!report) throw new Error('Report not found')
+    await validateReportOwnership(collectionName, userId)
 
     const searchVector = await searchEmbeddings(searchQuestion)
 
