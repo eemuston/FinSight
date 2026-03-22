@@ -22,3 +22,8 @@ export interface DecodedToken {
     id: string
     username: string
 }
+
+export interface NewChat {
+    collectionName: string,
+    message: string
+}
