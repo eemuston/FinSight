@@ -5,9 +5,11 @@ import { config } from './config'
 import { DecodedToken } from '../types'
 
 const requestLogger = (request: Request, _response: Response, next: NextFunction) => {
+    const body = { ...request.body }
+    if (body.password) body.password = '*********'
     console.log('Method:', request.method)
     console.log('Path:  ', request.path)
-    console.log('Body:  ', request.body)
+    console.log('Body:  ', body)
     console.log('-----')
     next()
 }

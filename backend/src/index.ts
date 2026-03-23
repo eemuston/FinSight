@@ -8,6 +8,7 @@ import userRouter from './routes/users'
 import loginRouter from './routes/login'
 import chatRouter from './routes/chat'
 import middleware from './utils/middleware'
+import reportRouter from './routes/report'
 import mongoose from 'mongoose'
 import cors from 'cors'
 const app = express()
@@ -24,6 +25,7 @@ app.use(middleware.tokenExtractor)
 app.use('/api/pdf', middleware.userExtractor, pdfRouter)
 app.use('/api/search', middleware.userExtractor, searchRouter)
 app.use('/api/chat', middleware.userExtractor, chatRouter)
+app.use('/api/reports', middleware.userExtractor, reportRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
 
