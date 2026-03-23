@@ -9,7 +9,9 @@ import loginRouter from './routes/login'
 import chatRouter from './routes/chat'
 import middleware from './utils/middleware'
 import mongoose from 'mongoose'
+import cors from 'cors'
 const app = express()
+app.use(cors())
 
 mongoose.connect(config.MONGODB_URI!)
 .then(() => console.log('MongoDB connected'))
