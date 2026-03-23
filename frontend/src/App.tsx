@@ -1,9 +1,19 @@
 import { useUser } from "./contexts/UserContext"
 import Login from "./components/Login"
 import Logout from "./components/Logout"
+import Dashboard from "./components/Dashboard"
+import { useEffect } from "react"
 
 const App = () => {
-  const { user } = useUser()
+  const { user, userDispatch } = useUser()  
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedFinancialGuruuser')
+    if(loggedUserJSON) {
+      const loggedUser = JSON.parse(loggedUserJSON)
+      userDispatch({ type: 'LOGIN', payload: loggedUser})
+    }
+  }, []) 
 
   return (
     <div>
@@ -13,6 +23,7 @@ const App = () => {
       <div>
         <Logout />
         Dashboard in here soon. Taco nights inc
+        <Dashboard />
       </div>}
     </div>
   )
