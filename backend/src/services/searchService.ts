@@ -17,9 +17,13 @@ const processSearch = async (collectionName: string, searchQuestion :string, use
 
     const results = await qdrantClient.search(collectionName, {
         vector: searchVector,
-        limit: 1
+        limit: 3
         //limit is 1 for testing. 4 or 5 chunks needed probably in real app.
     })
+
+    results.map(r => 
+        console.log('Score of the chunk: ', r.score)
+    )
 
     return results
 }
