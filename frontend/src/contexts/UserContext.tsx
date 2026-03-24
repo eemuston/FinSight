@@ -1,20 +1,5 @@
 import { createContext, useReducer, useContext } from 'react'
-
-interface User {
-    username: string
-    token: string
-    name?: string
-    id: string
-}
-
-type UserAction =
-    | { type: 'LOGIN', payload: User}
-    | { type: 'LOGOUT' }
-
-interface UserContextType {
-    user: User | null
-    userDispatch: React.Dispatch<UserAction>
-}
+import type { User, UserAction, UserContextType } from '../types'
 
 const UserContext = createContext<UserContextType | null>(null)
 

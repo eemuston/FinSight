@@ -1,9 +1,5 @@
 import axios from 'axios'
-
-interface NewLogin {
-    username: string
-    password: string
-}
+import type { NewLogin } from '../types'
 
 const login = async (credentials: NewLogin) => {
     const response = await axios.post('http://localhost:3000/api/login', credentials)
