@@ -43,8 +43,8 @@ const reportSummarySchema = new mongoose.Schema({
     },
 
     //Strengths and risks.
-    keyStrengths: [String],
-    keyRisks: [String]
+    keyStrengths: [{ type: String }],
+    keyRisks: [{ type: String }]
 })
 
 reportSummarySchema.set('toJSON', {
