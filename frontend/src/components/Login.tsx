@@ -1,11 +1,13 @@
 import { useState } from "react"
 import loginService from "../services/login"
 import { useUser } from "../contexts/UserContext"
+import { useNavigate } from "react-router-dom"
 
 const Login = () => {
     const { userDispatch } = useUser()
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const navigate = useNavigate()
 
     const handleLogin = async (e: React.BaseSyntheticEvent) => {
         e.preventDefault()
@@ -18,6 +20,7 @@ const Login = () => {
             userDispatch({ type: 'LOGIN', payload: user})
             setUsername('')
             setPassword('')
+            navigate('/dashboard')
         } catch (exception) {
             console.log('NO MIKEY NO NOO MIKEY THAT WAS SO NOT RIGHT!')
         }

@@ -3,6 +3,7 @@ import Login from "./components/Login"
 import Logout from "./components/Logout"
 import Dashboard from "./components/Dashboard"
 import { useEffect } from "react"
+import { Routes, Route, Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 
 const App = () => {
   const { user, userDispatch } = useUser()  
@@ -21,9 +22,20 @@ const App = () => {
       {user === null && <Login />}
       {user !== null && 
       <div>
-        <Logout />
-        Dashboard in here soon. Taco nights inc
-        <Dashboard />
+        <Routes>
+          <Route path="/" element={
+            <div>
+              HOMEPAAAGE
+            </div>
+          }/>
+          <Route path="/dashboard" element={
+            <div>
+              <Logout />
+              <Dashboard />
+              Dashboard in here soon. Taco nights inc
+            </div>
+            }/>
+        </Routes>
       </div>}
     </div>
   )
