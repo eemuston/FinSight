@@ -3,7 +3,7 @@ import Login from "./components/Login"
 import Logout from "./components/Logout"
 import Dashboard from "./components/Dashboard"
 import { useEffect } from "react"
-import { Routes, Route, Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 const App = () => {
   const { user, userDispatch } = useUser()  
