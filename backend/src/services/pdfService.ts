@@ -37,7 +37,7 @@ const fileValidation = async (file: Express.Multer.File): Promise<void> => {
 
     const response = await anthropic.messages.create({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 10,
+        max_tokens: 3,
         messages: [{
             role: 'user',
             content: [{
