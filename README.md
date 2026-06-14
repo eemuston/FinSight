@@ -20,6 +20,4 @@ Vector DB: Qdrant
 
 Auth: JWT
 
-Infra: Docker
-
 Frontend (in development): React, TypeScript
