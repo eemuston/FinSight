@@ -18,21 +18,21 @@ const App = () => {
 
   return (
     <div>
-      <h1>It's time to do some scetchy shit DOO DAA</h1>
+      <h1>Finsight</h1>
       {user === null && <Login />}
       {user !== null && 
       <div>
         <Routes>
           <Route path="/" element={
             <div>
-              HOMEPAAAGE
+              HOMEPAGE
             </div>
           }/>
           <Route path="/dashboard" element={
             <div>
               <Logout />
               <Dashboard />
-              Dashboard in here soon. Taco nights inc
+              Dashboard in here soon.
             </div>
             }/>
         </Routes>
